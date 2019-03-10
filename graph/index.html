@@ -1,0 +1,134 @@
+<html>
+    <head>
+    <meta charset="utf-8">
+    <script src="./three.min.js"></script>
+    <script src="./math.min.js"></script>
+    <script src="./OrbitControls.js"></script>
+    <script src="./4dgraph.js"></script>
+    <script>
+        const linear = x => x;
+
+        // x^2 + 1
+        const example1 = "x => math.add(math.pow(x, 2), 1)";
+        // x^3 - 1
+        const example2 = "x => math.add(math.pow(x, 3), -1)";
+        // x^2 + (2 - i)x - 5
+        const example3 = "x => math.add(math.add(math.pow(x, 2), math.multiply(math.add(2, new THREE.Complex(0,-1)),x)), -5)";
+        // sqrt(x - 1)
+        const example4 = "x => math.sqrt(math.add(x,-1))";
+        // x^3 + x^2 - 2
+        const example5 = "x => math.add(math.add(math.pow(x, 3), math.pow(x, 2)), -2)";
+        var renderer;
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(45 , 1);
+        function ShowGraph(fstr, rangeX, rangeY, rangeZ, rangeC, step){
+            const width = 960;
+            const height = 540;
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.querySelector('#canvas')
+            });
+            renderer.setSize(width, height);
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45 , width / height);
+            scene.background = new THREE.Color(0xffffff);
+            const GraphMesh = new THREE.Mesh(
+                GetGraphGeometry
+                (
+                    eval(fstr),
+                    rangeX,
+                    rangeY,
+                    rangeZ,
+                    rangeC,
+                    step
+                ),
+                new THREE.MeshBasicMaterial({ vertexColors: 2, transparent:true, opacity:0.5 })
+            );
+            GraphMesh.rotation.x = Math.PI * 3 / 2;
+            scene.add(GraphMesh);
+            CoordinateLines = new THREE.LineSegments(
+                GetCoordinateGeomatry
+                (
+                    rangeX,
+                    rangeY,
+                    rangeZ,
+                    step * 10
+                ),
+                new THREE.LineBasicMaterial({ color: 0x000000, transparent:true, opacity:0.5 })
+            );
+            scene.add(CoordinateLines);
+            AdjustCameraFromInput();
+        }
+        
+        function AdjustCamera(distance,xrad,yrad){
+            camera.position.x = distance * Math.sin(xrad) * Math.cos(yrad);
+            camera.position.y = distance * Math.sin(yrad);
+            camera.position.z = distance * Math.cos(xrad) * Math.cos(yrad);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+            renderer.render(scene,camera);
+        }
+
+        function AdjustCameraFromInput(){
+            AdjustCamera(
+                document.getElementById('distance-input').value,
+                document.getElementById('yaw').value / 360 * Math.PI,
+                document.getElementById('pitch').value / 360 * Math.PI
+            );
+        }
+    </script>
+    </head>
+    <body>
+        <canvas id="canvas" width="960" height="540" style="width: 960px; height: 540px;"></canvas>
+        <div>
+            <select onchange="document.getElementById('lambda-equation').value = eval(this.options[this.selectedIndex].value)">
+                <option value="example1">x^2 + 1</option>
+                <option value="example2">x^3 - 1</option>
+                <option value="example3">x^2 + (2 - i)x - 5</option>
+                <option value="example4">sqrt(x - 1)</option>
+                <option value="example5">x^3 + x^2 - 2</option>
+            </select>
+        </div>
+        <div>
+            <span>方程式</span>
+            <input id="lambda-equation" style="width: 300px;" value="x=>x">
+            <span>刻み幅</span>
+            <input id="step-input" value="0.1">
+            <button onclick="
+                ShowGraph(
+                    document.getElementById('lambda-equation').value,
+                    GetRange(document.getElementById('rangeX-start').value,document.getElementById('rangeX-end').value),
+                    GetRange(document.getElementById('rangeY-start').value,document.getElementById('rangeY-end').value),
+                    GetRange(document.getElementById('rangeZ-start').value,document.getElementById('rangeZ-end').value),
+                    GetRange(document.getElementById('rangeC-start').value,document.getElementById('rangeC-end').value),
+                    document.getElementById('step-input').value
+                );">表示</button>
+        </div>
+        <div>
+            <span>カメラ距離</span>
+            <input id="distance-input" type="number" onchange="AdjustCameraFromInput()" value="10">
+            <span>横回転,縦回転:</span>
+            <input id="yaw" type="number" onchange="AdjustCameraFromInput()" value="0">
+            <input id="pitch" type="number" onchange="AdjustCameraFromInput()" value="0">
+            <button onclick="AdjustCameraFromInput()">カメラ更新</button>
+        </div>
+        <div>
+            <span>X軸(X.re)の下限,上限:</span>
+            <input id="rangeX-start" value="-10">
+            <input id="rangeX-end" value="10">
+        </div>
+        <div>
+            <span>Y軸(X.im)の下限,上限:</span>
+            <input id="rangeY-start" value="-10">
+            <input id="rangeY-end" value="10">
+        </div>
+        <div>
+            <span>Z軸(Y.re)の下限,上限:</span>
+            <input id="rangeZ-start" value="-10">
+            <input id="rangeZ-end" value="10">
+        </div>
+        <div>
+            <span>色(Y.im)の下限,上限:</span>
+            <input id="rangeC-start" value="-10">
+            <input id="rangeC-end" value="10">
+        </div>
+    </body>
+</html>
