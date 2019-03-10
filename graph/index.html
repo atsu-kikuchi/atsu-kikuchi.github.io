@@ -13,7 +13,7 @@
         // x^3 - 1
         const example2 = "x => math.add(math.pow(x, 3), -1)";
         // x^2 + (2 - i)x - 5
-        const example3 = "x => math.add(math.add(math.pow(x, 2), math.multiply(math.add(2, new THREE.Complex(0,-1)),x)), -5)";
+        const example3 = "x => math.add(math.add(math.pow(x, 2), math.multiply(math.add(2, math.Complex(0,-1)),x)), -5)";
         // sqrt(x - 1)
         const example4 = "x => math.sqrt(math.add(x,-1))";
         // x^3 + x^2 - 2
@@ -21,7 +21,7 @@
         var renderer;
         var scene = new THREE.Scene();
         var camera = new THREE.PerspectiveCamera(45 , 1);
-        function ShowGraph(fstr, rangeX, rangeY, rangeZ, rangeC, step){
+        function ShowGraph(fstr, rangeX, rangeY, rangeZ, rangeC, step, coordStep){
             const width = 960;
             const height = 540;
             renderer = new THREE.WebGLRenderer({
@@ -51,7 +51,7 @@
                     rangeX,
                     rangeY,
                     rangeZ,
-                    step * 10
+                    coordStep
                 ),
                 new THREE.LineBasicMaterial({ color: 0x000000, transparent:true, opacity:0.5 })
             );
@@ -92,6 +92,8 @@
             <input id="lambda-equation" style="width: 300px;" value="x=>x">
             <span>刻み幅</span>
             <input id="step-input" value="0.1">
+            <span>座標刻み幅</span>
+            <input id="coordstep-input" value="1">
             <button onclick="
                 ShowGraph(
                     document.getElementById('lambda-equation').value,
@@ -99,7 +101,8 @@
                     GetRange(document.getElementById('rangeY-start').value,document.getElementById('rangeY-end').value),
                     GetRange(document.getElementById('rangeZ-start').value,document.getElementById('rangeZ-end').value),
                     GetRange(document.getElementById('rangeC-start').value,document.getElementById('rangeC-end').value),
-                    document.getElementById('step-input').value
+                    document.getElementById('step-input').value,
+                    document.getElementById('coordstep-input').value
                 );">表示</button>
         </div>
         <div>
