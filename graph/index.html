@@ -3,7 +3,6 @@
     <meta charset="utf-8">
     <script src="./three.min.js"></script>
     <script src="./math.min.js"></script>
-    <script src="./OrbitControls.js"></script>
     <script src="./4dgraph.js"></script>
     <script>
         const linear = x => x;
@@ -13,7 +12,7 @@
         // x^3 - 1
         const example2 = "x => math.add(math.pow(x, 3), -1)";
         // x^2 + (2 - i)x - 5
-        const example3 = "x => math.add(math.add(math.pow(x, 2), math.multiply(math.add(2, math.Complex(0,-1)),x)), -5)";
+        const example3 = "x => math.add(math.add(math.pow(x, 2), math.multiply(math.add(2, math.complex(0,-1)),x)), -5)";
         // sqrt(x - 1)
         const example4 = "x => math.sqrt(math.add(x,-1))";
         // x^3 + x^2 - 2
